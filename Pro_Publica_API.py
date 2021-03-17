@@ -1,5 +1,5 @@
 import requests, json
-
+#API key for ProPublica is in pro_publica_api.txt and is not uploaded to Git
 with open("pro_publica_api.txt") as f:
     pro_publica_key = f.read()
 
