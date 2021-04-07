@@ -1,3 +1,5 @@
+#Burning Question:  Do younger politicans (those with less seniority) vote more on the issue and less on partisan lines
+
 import requests, json, matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.patches as mpatches
@@ -7,13 +9,16 @@ from statistics import mean
 with open("pro_publica_api.txt") as f:
     pro_publica_key = f.read()
 
-#Sessions of Congress with necessary voting percentage data start at session 101 year 1989 to 1991  and end at current, session 117
+#Sessions of Congress with necessary voting percentage data start at session 101 year 1989 to 1991 and end at current, session 117
 
+#string template to allow modification of sessions pulled depending on need 
 pro_publica_req = 'https://api.propublica.org/congress/v1/{}/senate/members.json'
+
 
 def get_congress_session(number):
     return requests.get(pro_publica_req.format(number), headers = {"X-API-Key" : pro_publica_key})
 
+#scatter plot functions
 def calculate_senority(senators):
     seniority = [int (senator["seniority"]) for senator in senators]
     maximum = max (seniority)
@@ -40,6 +45,8 @@ def display_scatter_plot (response):
     plt.legend(handles=[democrat_blue, republican_red, other_green])
     plt.show()
 
+#line graph items
+
 def calculate_votes_with_party_average(senators, party):
     filter_senators = [ senator for senator in senators if senator ["party"] ==party]
     return mean(calculate_votes_with_party(filter_senators)) if filter_senators else [0]
@@ -60,6 +67,9 @@ item_1 = ax.bar(x - width, republican_mean, width, label='Republican', color="re
 item_2 = ax.bar(x, democrat_mean, width, label='Democrat', color="blue")
 item_3 = ax.bar (x + width, independent_mean, width, label= "Independent", color="green")
 
+plt.xlabel("Party")
+plt.ylabel("Average Vote with Party Percentage")
+
 ax.set_xticks(x)
 ax.set_xticklabels(congressional_sessions_range)
 ax.legend()
@@ -69,5 +79,11 @@ fig.tight_layout()
 plt.show()
 
 
+#demonstrate when Democrats hold majority
 display_scatter_plot(get_congress_session(117))
 
+#demonstrate when Republicans hold Majority
+display_scatter_plot(get_congress_session(115))
+
+#Cynical view:  if in minority, consequences for bucking the party are minor 
+#Slighty less cynical:  if in minority, legislation that comes to the vote is from the majority party and depending on vote, opposition is preferred in order to appease local constituents 
